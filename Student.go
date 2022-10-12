@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -14,12 +13,14 @@ type Student struct {
 	age   int
 	grade int
 }
+type University struct { //Структура позволяющая хранить карты студентов
+	A map[string]Student
+}
 
 func transformation(a string) int { // переводит строчные значения в int
 	b, err := strconv.Atoi(a)
 	if err != nil {
-		fmt.Println("Второе и третье значение должны быть цифры")
-		log.Fatal(err)
+		fmt.Println("Второе и третье значение должны быть цифры", err)
 	}
 	return b
 }
@@ -34,18 +35,27 @@ func newStudent(txt string) (Student, string) { // принимает на вх�
 		transformation(txtSplited[2])}, StudentName
 }
 
+func (M University) Get(Unit *Student, Name string) { //Метод добавляющий структуру в массив по указателю
+	M.A[Name] = *Unit
+}
+func (M University) Put() {
+	fmt.Println("Студенты из хранилища:")
+	for _, v := range M.A {
+		fmt.Println(v)
+	}
+}
 func main() {
 
-	M := make(map[string]*Student) // Массив, принимающий значение по указателю
+	M := University{ // Массив, принимающий значение
+		A: make(map[string]Student),
+	}
 
 	sc := bufio.NewScanner(os.Stdin) //Принимает построчный ввод
 	for sc.Scan() {
 		txt := sc.Text()
-		A, studentName := newStudent(txt)
-		M[studentName] = &A // Запись в массив через указатель
+		Unit, Name := newStudent(txt)
+		M.Get(&Unit, Name) //Вызов метода Get
+
 	}
-	fmt.Println("Студенты из хранилища:")
-	for _, v := range M {
-		fmt.Println(v)
-	}
+	M.Put() //Вызов метода Put
 }
